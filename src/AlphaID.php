@@ -9,7 +9,7 @@ use YogCloud\Exception\InvalidArgumentException;
 
 class AlphaID
 {
-    public const MIN_ALPHABET_LENGTH = 15;
+    public const MIN_ALPHABET_LENGTH = 16;
 
     public const SEP_DIV = 3.5;
 
@@ -25,7 +25,7 @@ class AlphaID
 
     private $_max_int_value = 1000000000;
 
-    public function __construct($salt = 'yogcloud', $min_hash_length = 4, $alphabet = '')
+    public function __construct($salt = 'yogcloud', $min_hash_length = 6, $alphabet = '')
     {
         /* if either math precision library is present, raise $this->_max_int_value */
         if (function_exists('gmp_add')) {
