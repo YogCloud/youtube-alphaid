@@ -1,23 +1,31 @@
 <?php
 
-namespace Luffy;
+declare(strict_types=1);
 
-use Luffy\Exception\DecodeException;
-use Luffy\Exception\InvalidArgumentException;
+namespace YogCloud;
+
+use YogCloud\Exception\DecodeException;
+use YogCloud\Exception\InvalidArgumentException;
 
 class AlphaID
 {
-    const MIN_ALPHABET_LENGTH = 16;
-    const SEP_DIV = 3.5;
-    const GUARD_DIV = 12;
+    public const MIN_ALPHABET_LENGTH = 15;
 
-    private $_alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-    private $_seps = 'cfhistuCFHISTU';
+    public const SEP_DIV = 3.5;
+
+    public const GUARD_DIV = 12;
+
+    private $_alphabet = 'abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    private $_seps = 'randomRandom';
+
     private $_min_hash_length = 0;
+
     private $_math_functions = [];
+
     private $_max_int_value = 1000000000;
 
-    public function __construct($salt = 'luffy', $min_hash_length = 4, $alphabet = '')
+    public function __construct($salt = 'yogcloud', $min_hash_length = 4, $alphabet = '')
     {
         /* if either math precision library is present, raise $this->_max_int_value */
         if (function_exists('gmp_add')) {
@@ -38,8 +46,8 @@ class AlphaID
         /* handle parameters */
         $this->_salt = $salt;
 
-        if ((int)$min_hash_length > 0) {
-            $this->_min_hash_length = (int)$min_hash_length;
+        if ((int) $min_hash_length > 0) {
+            $this->_min_hash_length = (int) $min_hash_length;
         }
 
         if ($alphabet) {
@@ -63,8 +71,8 @@ class AlphaID
         $this->_alphabet = implode('', array_diff($alphabet_array, $seps_array));
         $this->_seps = $this->_consistent_shuffle($this->_seps, $this->_salt);
 
-        if (!$this->_seps || (strlen($this->_alphabet) / strlen($this->_seps)) > self::SEP_DIV) {
-            $seps_length = (int)ceil(strlen($this->_alphabet) / self::SEP_DIV);
+        if (! $this->_seps || (strlen($this->_alphabet) / strlen($this->_seps)) > self::SEP_DIV) {
+            $seps_length = (int) ceil(strlen($this->_alphabet) / self::SEP_DIV);
 
             if ($seps_length == 1) {
                 ++$seps_length;
@@ -80,7 +88,7 @@ class AlphaID
         }
 
         $this->_alphabet = $this->_consistent_shuffle($this->_alphabet, $this->_salt);
-        $guard_count = (int)ceil(strlen($this->_alphabet) / self::GUARD_DIV);
+        $guard_count = (int) ceil(strlen($this->_alphabet) / self::GUARD_DIV);
 
         if (strlen($this->_alphabet) < 3) {
             $this->_guards = substr($this->_seps, 0, $guard_count);
@@ -92,7 +100,7 @@ class AlphaID
     }
 
     /**
-     * @param string|array ...$numbers
+     * @param array|string ...$numbers
      * @return false|mixed|string
      */
     public function encode(...$numbers)
@@ -103,14 +111,14 @@ class AlphaID
             $numbers = $numbers[0];
         }
 
-        if (!$numbers) {
+        if (! $numbers) {
             return $ret;
         }
 
         foreach ($numbers as $number) {
-            $is_number = ctype_digit((string)$number);
+            $is_number = ctype_digit((string) $number);
 
-            if (!$is_number || $number < 0 || $number > $this->_max_int_value) {
+            if (! $is_number || $number < 0 || $number > $this->_max_int_value) {
                 return $ret;
             }
         }
@@ -123,7 +131,7 @@ class AlphaID
         try {
             $ret = [];
 
-            if (!is_string($hash) || !($hash = trim($hash))) {
+            if (! is_string($hash) || ! ($hash = trim($hash))) {
                 return $ret;
             }
 
@@ -135,7 +143,7 @@ class AlphaID
 
     public function encode_hex($str)
     {
-        if (!ctype_xdigit((string)$str)) {
+        if (! ctype_xdigit((string) $str)) {
             return '';
         }
 
@@ -146,7 +154,7 @@ class AlphaID
             $numbers[$i] = hexdec('1' . $number);
         }
 
-        return call_user_func_array(array($this, 'encode'), $numbers);
+        return call_user_func_array([$this, 'encode'], $numbers);
     }
 
     public function decode_hex($hash)
@@ -154,7 +162,7 @@ class AlphaID
         $ret = '';
         $numbers = $this->decode($hash);
 
-        if (!is_array($numbers)) {
+        if (! is_array($numbers)) {
             $numbers = [$numbers];
         }
 
@@ -209,7 +217,7 @@ class AlphaID
             }
         }
 
-        $half_length = (int)(strlen($alphabet) / 2);
+        $half_length = (int) (strlen($alphabet) / 2);
         while (strlen($ret) < $this->_min_hash_length) {
             $alphabet = $this->_consistent_shuffle($alphabet, $alphabet);
             $ret = substr($alphabet, $half_length) . $ret . substr($alphabet, 0, $half_length);
@@ -248,7 +256,7 @@ class AlphaID
                     $alphabet,
                     substr($lottery . $this->_salt . $alphabet, 0, strlen($alphabet))
                 );
-                $ret[] = (int)$this->_unhash($sub_hash, $alphabet);
+                $ret[] = (int) $this->_unhash($sub_hash, $alphabet);
             }
 
             if ($this->_encode($ret) != $hash) {
@@ -266,7 +274,7 @@ class AlphaID
     private function _consistent_shuffle($alphabet, $salt)
     {
         $salt_length = strlen($salt);
-        if (!$salt_length) {
+        if (! $salt_length) {
             return $alphabet;
         }
 
@@ -293,7 +301,7 @@ class AlphaID
             if ($input > $this->_lower_max_int_value && $this->_math_functions) {
                 $input = $this->_math_functions['str']($this->_math_functions['div']($input, $alphabet_length));
             } else {
-                $input = (int)($input / $alphabet_length);
+                $input = (int) ($input / $alphabet_length);
             }
         } while ($input);
 

@@ -1,13 +1,9 @@
 <?php
-/**
- * User: lufei
- * Date: 2021/8/12
- * Email: lufei@swoole.com
- */
 
-namespace Luffy\Exception;
+declare(strict_types=1);
+
+namespace YogCloud\Exception;
 
 class DecodeException extends \RuntimeException
 {
-
 }

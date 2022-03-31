@@ -3,13 +3,13 @@
 ## Install
 
 ```bash
-composer require sy-records/alphaid
+composer require youcloud/alphaid
 ```
 
 ## Usage
 
 ```php
-use Luffy\AlphaID;
+use YogCloud\AlphaID;
 
 $id = new AlphaID();
 $code = $id->encode(PHP_INT_MAX);

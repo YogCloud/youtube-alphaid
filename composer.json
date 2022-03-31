@@ -1,12 +1,12 @@
 {
-  "name": "sy-records/alphaid",
+  "name": "yogcloud/alphaid",
   "type": "library",
   "description": "Create Youtube-Like IDs With PHP.",
   "license": "MIT",
   "authors": [
     {
-      "name": "sy-records",
-      "email": "52o@qq52o.cn"
+      "name": "cexll",
+      "email": "evanxian9@gmail.com"
     }
   ],
   "require": {
@@ -19,7 +19,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Luffy\\": "src"
+      "YogCloud\\": "src"
     }
   }
 }
